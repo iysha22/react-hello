@@ -1,13 +1,201 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/4geeks.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hello Rigo with Vanilla.js</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/js/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lista de Tareas Bonita</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: #f0f4f8;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #333;
+  }
+
+  .container {
+    background: #fff;
+    width: 100%;
+    max-width: 420px;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+  }
+
+  h2 {
+    margin-bottom: 24px;
+    font-weight: 600;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #2c3e50;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 12px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 2px solid #d1d9e6;
+    border-radius: 8px;
+    transition: border-color 0.3s ease;
+    outline-offset: 2px;
+  }
+
+  input[type="text"]:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+
+  button#addBtn {
+    background: #3498db;
+    border: none;
+    color: white;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button#addBtn:hover {
+    background: #2980b9;
+  }
+
+  ul#taskList {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 30px;
+  }
+
+  ul#taskList li {
+    background: #eaf2f8;
+    border-radius: 10px;
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    color: #34495e;
+    box-shadow: 0 4px 8px rgba(52, 73, 94, 0.1);
+    transition: transform 0.15s ease;
+  }
+
+  ul#taskList li:hover {
+    transform: translateX(6px);
+  }
+
+  button.delete-btn {
+    background: #e74c3c;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(231, 76, 60, 0.6);
+    transition: background-color 0.3s ease;
+  }
+
+  button.delete-btn:hover {
+    background: #c0392b;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .container {
+      padding: 20px 25px;
+    }
+
+    input[type="text"] {
+      font-size: 0.9rem;
+    }
+
+    button#addBtn {
+      font-size: 0.9rem;
+      padding: 10px 14px;
+    }
+
+    ul#taskList li {
+      font-size: 1rem;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Mi Lista de Tareas</h2>
+
+  <div class="input-group">
+    <input id="taskInput" type="text" placeholder="Nueva tarea..." />
+    <button id="addBtn">Agregar</button>
+  </div>
+
+  <ul id="taskList"></ul>
+</div>
+
+<script>
+  const taskInput = document.getElementById('taskInput');
+  const addBtn = document.getElementById('addBtn');
+  const taskList = document.getElementById('taskList');
+
+  let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+  function saveTasks() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }
+
+  function renderTasks() {
+    taskList.innerHTML = '';
+
+    tasks.forEach((task, index) => {
+      const li = document.createElement('li');
+      li.textContent = task;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'X';
+      deleteBtn.classList.add('delete-btn');
+      deleteBtn.addEventListener('click', () => {
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+      });
+
+      li.appendChild(deleteBtn);
+      taskList.appendChild(li);
+    });
+  }
+
+  addBtn.addEventListener('click', () => {
+    const newTask = taskInput.value.trim();
+    if (newTask === '') return alert('Escribe una tarea.');
+
+    tasks.push(newTask);
+    saveTasks();
+    renderTasks();
+    taskInput.value = '';
+    taskInput.focus();
+  });
+
+  taskInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') addBtn.click();
+  });
+
+  renderTasks();
+</script>
+
+</body>
 </html>
